@@ -1,6 +1,7 @@
 import type { Configuration } from './types';
 import Status from '../../src/components/status.svelte';
 import { getDatasthor } from './datasthor';
+import { loadFormPage } from './form-page';
 
 export const initialize = (element: HTMLElement, configuration: Configuration) => {
   const storage = getDatasthor(configuration);
@@ -18,3 +19,7 @@ export const initialize = (element: HTMLElement, configuration: Configuration) =
 window.mmmFitTracker = {
   initialize,
 };
+
+if (window.location.pathname === '/fit-tracker') {
+  loadFormPage();
+}

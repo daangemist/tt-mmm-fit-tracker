@@ -46,7 +46,7 @@
 <!-- svelte-ignore a11y-no-static-element-interactions -->
 <div on:click={() => (showForm = !showForm)}>
   {#if lastFetchedWeight === undefined}
-    <p>No weight fetched yet.</p>
+    <p>Fetching weight...</p>
   {:else if lastFetchedWeight === null}
     <p>There is no weight available.</p>
     <p class="small">Click to enter your weight.</p>

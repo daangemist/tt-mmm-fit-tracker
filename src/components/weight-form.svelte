@@ -3,6 +3,8 @@
   import type { FitTrackerStorage, Weight } from '../types';
 
   export let storage: FitTrackerStorage;
+  export let showSubmit: boolean = false;
+
   let inputWeight: string;
 
   const dispatch = createEventDispatcher<{ weightAdded: { weight: Weight } }>();
@@ -23,4 +25,7 @@
 <form on:submit|preventDefault={doAddWeight}>
   <!-- svelte-ignore a11y-autofocus -->
   <input autofocus type="text" bind:value={inputWeight} placeholder="Enter your weight." />
+  {#if showSubmit}
+    <button type="submit">Add weight</button>
+  {/if}
 </form>
