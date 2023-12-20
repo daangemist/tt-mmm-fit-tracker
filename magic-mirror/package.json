@@ -1,0 +1,13 @@
+{
+  "name": "mmm-fit-tracker",
+  "source": "src/index.ts",
+  "type": "commonjs",
+  "publishConfig": {
+    "source": "src/index.ts",
+    "main": "./dist/bundle.js"
+  },
+  "scripts": {
+    "build": "vite build",
+    "dev": "nodemon --ignore dist -e ts,svelte --watch src --watch ../src --exec \"npm run build\""
+  }
+}

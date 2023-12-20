@@ -1,0 +1,37 @@
+{
+  "name": "tt-mmm-fit-tracker",
+  "private": true,
+  "scripts": {
+    "build:mm": "cd magic-mirror && npm run build",
+    "dev:mm": "cd magic-mirror && npm run dev",
+    "lint": "concurrently --kill-others-on-fail \"npm:lint:*\"",
+    "lint:prettier": "prettier --check --log-level=warn src magic-mirror/src",
+    "lint:tsc": "tsc --noEmit",
+    "lint:eslint": "eslint --ext=js,jsx,ts,tsx --max-warnings=0 src magic-mirror/src",
+    "format": "prettier --write src && eslint --ext=js,jsx,ts,tsx --fix src magic-mirror/src"
+  },
+  "devDependencies": {
+    "@sveltejs/vite-plugin-svelte": "^3.0.1",
+    "@tsconfig/node18-strictest": "^1.0.0",
+    "@typescript-eslint/eslint-plugin": "^6.14.0",
+    "@typescript-eslint/parser": "^6.14.0",
+    "concurrently": "^8.2.2",
+    "eslint": "^8.56.0",
+    "eslint-config-daangemist": "^1.1.4",
+    "eslint-import-resolver-typescript": "^3.6.1",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-only-warn": "^1.1.0",
+    "eslint-plugin-svelte": "^2.35.1",
+    "eslint-plugin-unicorn": "^49.0.0",
+    "microbundle": "^0.15.1",
+    "nodemon": "^3.0.2",
+    "prettier": "^3.1.1",
+    "prettier-plugin-svelte": "^3.1.2",
+    "svelte": "^4.2.8",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.10"
+  },
+  "dependencies": {
+    "date-fns": "^3.0.1"
+  }
+}

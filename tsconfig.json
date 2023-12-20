@@ -1,0 +1,9 @@
+{
+    "extends": "@tsconfig/node18-strictest",
+    "compilerOptions": {
+        "noEmit": true,
+        "lib": ["DOM", "ESNext"],
+        "ignoreDeprecations": "5.0"
+    },
+    "include": ["src/**/*.ts", "magic-mirror/**/*.ts"]
+}
