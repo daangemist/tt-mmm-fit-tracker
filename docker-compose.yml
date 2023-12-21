@@ -7,6 +7,8 @@ services:
     volumes:
       - ./magic-mirror/.docker/config.js:/magic-mirror/config/config.js
       - .:/magic-mirror/modules/tt-mmm-fit-tracker
+    env_file:
+      - .env
     ports:
       - 8080:8080
     command: "./node_modules/.bin/nodemon --watch ./modules/fit-tracker ./serveronly/index.js"

@@ -48,6 +48,13 @@ let config = {
         },
         updateInterval: 600_000,
         unit: 'kg',
+        weight: {
+          maxAge: 1 * 60,
+        },
+        pushBullet: {
+          apiKey: '',
+          deviceParams: '',
+        },
       },
     },
   ],

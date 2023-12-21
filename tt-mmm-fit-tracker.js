@@ -14,7 +14,11 @@ Module.register('tt-mmm-fit-tracker', {
 
     this.domWrapper = document.createElement('div');
 
-    this.fitTracker = window.mmmFitTracker.initialize(this.domWrapper, this.config);
+    this.fitTracker = window.mmmFitTracker.initialize(
+      this.domWrapper,
+      this.config,
+      this.sendSocketNotification.bind(this)
+    );
   },
 
   // Override dom generator.

@@ -4,6 +4,15 @@ export type Configuration = {
     apiKey?: string;
     prefix: string;
   };
+  unit?: 'string';
+  updateInterval?: number;
+  weight?: {
+    maxAge?: number; // in minutes
+  };
+  pushBullet?: {
+    apiKey: string;
+    deviceParams: string;
+  };
 };
 
 declare global {

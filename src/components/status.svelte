@@ -1,19 +1,39 @@
 <script lang="ts">
   import { onMount, onDestroy } from 'svelte';
-  import type { FitTrackerStorage, Weight } from '../types';
+  import type { FitTrackerNotifier, FitTrackerStorage, Weight } from '../types';
   import { readWeight } from '../api';
-  import { formatRelative } from 'date-fns';
+  import { formatRelative, add } from 'date-fns';
   import WeightForm from './weight-form.svelte';
 
   export let storage: FitTrackerStorage;
+  export let notifier: FitTrackerNotifier;
   export let updateInterval = 600_000;
   export let unit: string = 'kg';
+  export let maxWeightAge: number = 24 * 60;
 
   let intervalId: number;
 
   let lastFetchedWeight: Weight | null;
   let weightFetchError: boolean;
   let showForm = false;
+  let alertOnMaxWeightAge = false;
+  let alertedOnMaxWeightAge = false;
+
+  async function checkAlertOnWeightAge(weight: Weight) {
+    if (alertOnMaxWeightAge) {
+      return; // We are already alerting.
+    }
+
+    if (add(weight.when, { minutes: maxWeightAge }) > new Date()) {
+      return; // Weight is not old enough.
+    }
+    alertOnMaxWeightAge = true;
+
+    if (!alertedOnMaxWeightAge) {
+      alertedOnMaxWeightAge = true;
+      await notifier.notify('Fit Tracker: Your weight is outdated.', 'Please weigh yourself and enter a new weight.');
+    }
+  }
 
   onMount(() => {
     intervalId = window.setInterval(() => {
@@ -21,6 +41,9 @@
         .then((weight) => {
           lastFetchedWeight = weight;
           weightFetchError = false;
+          if (weight !== null) {
+            checkAlertOnWeightAge(weight);
+          }
         })
         .catch(() => (weightFetchError = true));
     }, updateInterval);
@@ -28,6 +51,9 @@
       .then((weight) => {
         lastFetchedWeight = weight;
         weightFetchError = false;
+        if (weight !== null) {
+          checkAlertOnWeightAge(weight);
+        }
       })
       .catch(() => (weightFetchError = true));
   });
@@ -51,7 +77,7 @@
     <p>There is no weight available.</p>
     <p class="small">Click to enter your weight.</p>
   {:else}
-    <p>
+    <p class={alertOnMaxWeightAge ? 'alert' : ''}>
       Weight: {lastFetchedWeight.weight.toLocaleString(undefined, { maximumFractionDigits: 1 })}
       {unit}
       <br />
@@ -69,6 +95,9 @@
 {/if}
 
 <style>
+  .alert {
+    color: #ff0000;
+  }
   .small {
     font-size: 75%;
   }
