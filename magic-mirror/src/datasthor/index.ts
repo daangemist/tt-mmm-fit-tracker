@@ -39,7 +39,7 @@ export const getDatasthor = (configuration: Configuration) =>
         }
       }
 
-      await write<unknown, StoredWeight[]>(namespace, stripSlashFromBegin(prefix), apiKey, 'weight.json', [
+      await write<StoredWeight[]>(namespace, stripSlashFromBegin(prefix), apiKey, 'weight.json', [
         { weight, when: when.toISOString() },
         ...data,
       ]);

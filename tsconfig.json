@@ -1,9 +1,10 @@
 {
-    "extends": "@tsconfig/node18-strictest",
-    "compilerOptions": {
-        "noEmit": true,
-        "lib": ["DOM", "ESNext"],
-        "ignoreDeprecations": "5.0"
-    },
-    "include": ["src/**/*.ts", "magic-mirror/**/*.ts"]
+  "extends": "@tsconfig/node18-strictest",
+  "compilerOptions": {
+    "noEmit": true,
+    "lib": ["DOM", "ESNext"],
+    "ignoreDeprecations": "5.0",
+    "types": ["svelte"]
+  },
+  "include": ["src/**/*.ts", "magic-mirror/src/**/*.ts", "teletron/src/**/*.ts", "teletron/tests/server/**/*.ts"]
 }

@@ -51,7 +51,7 @@ let config = {
         weight: {
           maxAge: 1 * 60,
         },
-        pushBullet: {
+        ppushBullet: {
           apiKey: '',
           deviceParams: '',
         },

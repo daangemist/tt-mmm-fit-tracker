@@ -9,6 +9,7 @@ export type Configuration = {
   weight?: {
     maxAge?: number; // in minutes
   };
+  disableScreen?: boolean;
   pushBullet?: {
     apiKey: string;
     deviceParams: string;

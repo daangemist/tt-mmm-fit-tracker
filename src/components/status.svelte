@@ -4,12 +4,16 @@
   import { readWeight } from '../api';
   import { formatRelative, add } from 'date-fns';
   import WeightForm from './weight-form.svelte';
+  import ScreenDisabler from './screen-disabler.svelte';
+  import { debugLogger } from '../logger';
 
   export let storage: FitTrackerStorage;
   export let notifier: FitTrackerNotifier;
   export let updateInterval = 600_000;
   export let unit: string = 'kg';
   export let maxWeightAge: number = 24 * 60;
+  export let disableScreen: boolean = true;
+  export let manageUrl = '/fit-tracker';
 
   let intervalId: number;
 
@@ -35,27 +39,26 @@
     }
   }
 
+  async function fetchWeightData() {
+    try {
+      const weight = await readWeight(storage);
+
+      lastFetchedWeight = weight;
+      weightFetchError = false;
+      if (weight !== null) {
+        checkAlertOnWeightAge(weight);
+      }
+    } catch (error) {
+      weightFetchError = true;
+      debugLogger('Weight fetch error.', error);
+    }
+  }
+
   onMount(() => {
     intervalId = window.setInterval(() => {
-      readWeight(storage)
-        .then((weight) => {
-          lastFetchedWeight = weight;
-          weightFetchError = false;
-          if (weight !== null) {
-            checkAlertOnWeightAge(weight);
-          }
-        })
-        .catch(() => (weightFetchError = true));
+      void fetchWeightData();
     }, updateInterval);
-    readWeight(storage)
-      .then((weight) => {
-        lastFetchedWeight = weight;
-        weightFetchError = false;
-        if (weight !== null) {
-          checkAlertOnWeightAge(weight);
-        }
-      })
-      .catch(() => (weightFetchError = true));
+    void fetchWeightData();
   });
 
   onDestroy(() => {
@@ -78,7 +81,10 @@
     <p class="small">Click to enter your weight.</p>
   {:else}
     <p class={alertOnMaxWeightAge ? 'alert' : ''}>
-      Weight: {lastFetchedWeight.weight.toLocaleString(undefined, { maximumFractionDigits: 1 })}
+      Weight: {lastFetchedWeight.weight.toLocaleString(undefined, {
+        maximumFractionDigits: 1,
+        minimumFractionDigits: 1,
+      })}
       {unit}
       <br />
       <span class="smallest" title={lastFetchedWeight.when.toLocaleString()}>
@@ -92,6 +98,9 @@
 </div>
 {#if showForm}
   <WeightForm {storage} on:weightAdded={onWeightAdded} />
+{/if}
+{#if disableScreen && alertOnMaxWeightAge}
+  <ScreenDisabler {manageUrl} />
 {/if}
 
 <style>

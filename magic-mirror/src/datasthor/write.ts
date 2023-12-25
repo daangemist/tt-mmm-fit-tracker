@@ -1,13 +1,7 @@
 import { WRITE_PREFIX } from './constants';
 import { HttpError } from './http-error';
 
-export async function write<T, D>(
-  namespace: string,
-  prefix: string,
-  apiKey: string | undefined,
-  path: string,
-  data: D
-) {
+export async function write<D>(namespace: string, prefix: string, apiKey: string | undefined, path: string, data: D) {
   const headers: Record<string, string> = {};
   if (apiKey) {
     headers['Authorization'] = `Bearer ${apiKey}`;
