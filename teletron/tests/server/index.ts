@@ -3,6 +3,7 @@ import express from 'express';
 import { readFile } from 'node:fs/promises';
 import path from 'node:path';
 import { loadExtension } from './extension';
+import { assets, collections, components, widgets } from './extension/data';
 import { loadAssets } from './load/assets';
 import { getSuperSave, loadCollections } from './load/collections';
 import { readExtensionDetails } from './load/extension';
@@ -48,11 +49,25 @@ export async function start(packageJsonLocation: string, config: Record<string, 
   app.use('/assets', express.static(path.join(__dirname, './assets')));
 
   app.get('/api/extensions', (_req, res) => {
-    res.json([extensionDetails.teletron]);
+    res.json([
+      {
+        ...extensionDetails.teletron,
+        assets: assets,
+        widgets: widgets,
+        components: components,
+        collections: collections,
+      },
+    ]);
   });
 
   if (Array.isArray(extensionDetails.teletron.assets)) {
     loadAssets(absoluteExtensionBaseDirectory, extensionDetails.teletron.assets, extensionRouter);
+  }
+  if (Array.isArray(extensionDetails.teletron.components)) {
+    components.push(...extensionDetails.teletron.components);
+  }
+  if (Array.isArray(extensionDetails.teletron.widgets)) {
+    widgets.push(...extensionDetails.teletron.widgets);
   }
   if (Array.isArray(extensionDetails.teletron.collections)) {
     await loadCollections(extensionDetails.teletron.name, extensionDetails.teletron.collections);

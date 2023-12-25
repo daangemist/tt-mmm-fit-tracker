@@ -1,5 +1,7 @@
 'use strict';
 
+const LOCAL_STORAGE_KEY_PREFIX = 'tt-extension-';
+
 async function httpGet(url) {
   const rsp = await fetch(url);
   return await rsp.json();
@@ -13,7 +15,10 @@ async function httpPost(url, body) {
       'Content-Type': 'application/json',
     },
   });
-  return await rsp.json();
+  if (rsp.headers.get('Content-Type') === 'application/json') {
+    return await rsp.json();
+  }
+  return;
 }
 
 async function httpPatch(url, body) {
@@ -24,11 +29,36 @@ async function httpPatch(url, body) {
       'Content-Type': 'application/json',
     },
   });
-  return await rsp.json();
+  if (rsp.headers.get('Content-Type') === 'application/json') {
+    return await rsp.json();
+  }
+  return;
 }
 
 const collectionsOperators = {};
 let openComponent = undefined;
+
+let apiExtensionData;
+
+function generateTemplateConfiguration(configurationDefinition) {
+  // generate a template configuration
+  const requiredFields = configurationDefinition.fields.filter((field) => field.required) ?? [];
+  const generatedConfiguration = {};
+  for (const field of requiredFields) {
+    if (field.default) {
+      generatedConfiguration[field.attribute] = field.default;
+    } else if (field.type === 'text') {
+      generatedConfiguration[field.attribute] = '';
+    } else if (field.type === 'number') {
+      generatedConfiguration[field.attribute] = 1;
+    } else if (field.type === 'boolean') {
+      generatedConfiguration[field.attribute] = true;
+    } else {
+      generatedConfiguration[field.attribute] = {};
+    }
+  }
+  return generatedConfiguration;
+}
 
 function renderComponent() {
   try {
@@ -39,6 +69,28 @@ function renderComponent() {
 
     // Validate the configuration
     const configuration = JSON.parse(document.querySelector('#components-container textarea').value);
+
+    if (openComponent.definedComponent.configuration) {
+      const missingRequiredAttributes = [];
+      const configurationDefinition = openComponent.definedComponent.configuration;
+      const requiredFields = configurationDefinition.fields.filter((field) => field.required) ?? [];
+      for (const field of requiredFields) {
+        if (configuration[field.attribute] === undefined) {
+          missingRequiredAttributes.push(field.attribute);
+        }
+      }
+
+      if (missingRequiredAttributes.length > 0) {
+        alert(
+          `The following required attributes are missing from the configuration: ${missingRequiredAttributes.join(
+            ', '
+          )}`
+        );
+        return;
+      }
+    }
+
+    localStorage.setItem(`${LOCAL_STORAGE_KEY_PREFIX}${openComponent.componentName}`, JSON.stringify(configuration));
 
     const element = document.querySelector('#components-container .component');
     openComponent.renderableReturn = openComponent.renderer(element, { ...openComponent.basicProps, ...configuration });
@@ -79,13 +131,35 @@ function createMockTeletronWebStart(extensionName) {
         },
       },
       registerComponent: function (componentName, renderer) {
+        const definedComponent = apiExtensionData.components.find((component) => component.name === componentName);
+        if (!definedComponent) {
+          alert(`Component ${componentName} is not registered in the extension.`);
+          return;
+        }
         components.push({ componentName, renderer });
 
         const button = document.createElement('button');
-        button.innerText = `Component: ${componentName}`;
+        button.innerText = `Component: ${definedComponent.displayName ?? componentName}`;
         button.addEventListener('click', () => {
           document.querySelector('#components-container .close').innerHTML = `Close ${componentName}`;
           document.querySelector('#components-container').classList.remove('hidden');
+
+          if (localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}${componentName}`)) {
+            document.querySelector('#components-container textarea').value = JSON.stringify(
+              JSON.parse(localStorage.getItem(`${LOCAL_STORAGE_KEY_PREFIX}${componentName}`)),
+              '\t',
+              2
+            );
+          } else {
+            const generatedConfiguration = definedComponent.configuration
+              ? generateTemplateConfiguration(definedComponent.configuration)
+              : {};
+            document.querySelector('#components-container textarea').value = JSON.stringify(
+              generatedConfiguration,
+              '\t',
+              2
+            );
+          }
 
           openComponent = {
             componentName,
@@ -109,6 +183,7 @@ function createMockTeletronWebStart(extensionName) {
             },
           };
           openComponent.basicProps = basicProps;
+          openComponent.definedComponent = definedComponent;
 
           renderComponent();
         });
@@ -144,6 +219,8 @@ void (async function () {
 
   const extensionList = await httpGet('/api/extensions');
   const extension = extensionList[0];
+
+  apiExtensionData = extension;
 
   window.teletronRegisterExtension = createMockTeletronWebStart(extension.name);
 

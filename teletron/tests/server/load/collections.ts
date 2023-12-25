@@ -1,5 +1,6 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { type Collection, SuperSave } from 'supersave';
+import { collections } from '../extension/data';
 
 let superSave: SuperSave;
 
@@ -15,6 +16,7 @@ export function getSuperSave() {
 }
 
 export async function addCollection<T = unknown>(extensionName: string, collection: Collection) {
+  collections.push(collection);
   return superSave.addCollection<T>({ ...collection, namespace: extensionName });
 }
 export async function addEntity<T = unknown>(extensionName: string, collection: Collection) {

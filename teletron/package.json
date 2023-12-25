@@ -35,6 +35,43 @@
           "when": "string"
         }
       }
+    ],
+    "components": [
+      {
+        "name": "status",
+        "displayName": "Status",
+        "configuration": {
+          "fields": [
+            {
+              "attribute": "maxWeightAge",
+              "label": "Max Weight Age",
+              "help": "This is the number of minutes after which the weight is considered stale.",
+              "required": false,
+              "type": "number"
+            },
+            {
+              "attribute": "unit",
+              "label": "The unit to display for the weight",
+              "default": "kg",
+              "required": false,
+              "type": "text"
+            },
+            {
+              "attribute": "updateInterval",
+              "label": "The interval on which to update the read data, in milliseconds.",
+              "required": false,
+              "type": "number"
+            },
+            {
+              "attribute": "disableScreen",
+              "label": "Whether to block the screen when the fitness data is stale.",
+              "required": true,
+              "default": true,
+              "type": "boolean"
+            }
+          ]
+        }
+      }
     ]
   }
 }

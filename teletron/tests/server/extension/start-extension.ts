@@ -1,9 +1,8 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
-import type { ComponentInformation, WidgetInformation } from '@teletron/types';
-// eslint-disable-next-line import/no-extraneous-dependencies
 import express from 'express';
 import type { Collection } from 'supersave';
 import path from 'node:path';
+import { assets, components, widgets } from './data';
 import { loadAssets } from '../load/assets';
 import { addCollection, addEntity } from '../load/collections';
 import type { ExtensionManager, ExtensionManagerFunction } from '../types/backend';
@@ -16,12 +15,11 @@ export async function startExtension(
   config?: Record<string, any>
 ) {
   const router = express.Router();
-  const widgets: WidgetInformation[] = [];
-  const components: ComponentInformation[] = [];
 
   await extension({
     assets: (basePath: string, files: string[]) => {
       loadAssets(path.join(extensionBaseDirectory, basePath), files, router);
+      assets.push(...files);
     },
     collections: {
       create: async <T = unknown>(collection: Collection, serverOnly?: boolean) => {
@@ -59,7 +57,5 @@ export async function startExtension(
 
   return {
     router,
-    widgets,
-    components,
   };
 }
