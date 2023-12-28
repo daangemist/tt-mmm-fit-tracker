@@ -3,7 +3,7 @@ import type { FitTrackerStorage, Weight } from '../../../src/types';
 
 export const collectionStorage = (collection: ComponentWebStart['collections']): FitTrackerStorage => ({
   getWeight: async function (): Promise<Weight | null> {
-    const weights = await (collection['weight'] as CollectionOperator<Weight>).get('sort=-when');
+    const weights = await (collection['weight'] as CollectionOperator<Weight>).get('sort=-when&limit=1');
     if (!weights[0]) {
       return null;
     }

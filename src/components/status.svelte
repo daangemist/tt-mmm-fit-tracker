@@ -8,10 +8,10 @@
   import { debugLogger } from '../logger';
 
   export let storage: FitTrackerStorage;
-  export let notifier: FitTrackerNotifier;
+  export let notifier: FitTrackerNotifier | undefined;
   export let updateInterval = 600_000;
   export let unit: string = 'kg';
-  export let maxWeightAge: number = 24 * 60;
+  export let maxWeightAge: number = 7 * 24 * 60;
   export let disableScreen: boolean = true;
   export let manageUrl = '/fit-tracker';
 
@@ -33,7 +33,7 @@
     }
     alertOnMaxWeightAge = true;
 
-    if (!alertedOnMaxWeightAge) {
+    if (!alertedOnMaxWeightAge && notifier) {
       alertedOnMaxWeightAge = true;
       await notifier.notify('Fit Tracker: Your weight is outdated.', 'Please weigh yourself and enter a new weight.');
     }

@@ -8,6 +8,7 @@ export default defineConfig({
     }),
   ],
   build: {
+    minify: false, // If we don't do this, it fails on a redeclaration of const z.
     sourcemap: true,
     rollupOptions: {
       output: {
